@@ -2,6 +2,7 @@ from xmlrpc.client import ServerProxy
 from datetime import date, datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
+import sys, signal
 
 proxy = ServerProxy('http://localhost:5000')
 
@@ -39,6 +40,8 @@ def ui_loop():
             print("Invalid choice.")
     find_shortest_path(article1, article2)
 
+
+
 def take_index(articles):
     while True:
             try:
@@ -47,6 +50,8 @@ def take_index(articles):
                 return choice
             except:
                 print("You gave an invalid index. The index has to be a round number (int) and be in range of the list. Try again.")
+
+
 
 def find_shortest_path(a1,a2):
     start = time.time()
@@ -62,19 +67,7 @@ def find_shortest_path(a1,a2):
         print("Process interrupted.")
         exit(1)
 
-#def get_article(a):
-#    articles = proxy.get_article(a)
-#    return articles
 
-#def get_articles(article_list):
-#    with ThreadPoolExecutor() as executor: 
-#        articles = {executor.submit(proxy.get_article, i): i for i in article_list}
-#    try:
-#        for future in as_completed(articles):
-#            result_list = future.result()
-#            print(result_list)
-#    except Exception as e:
-#        print("Error occurred: {}".format(e))
 
 def get_articles(article_list):
     articles = proxy.get_articles(article_list)
@@ -82,7 +75,6 @@ def get_articles(article_list):
 
 
     
-
 def get_time():
     today = date.today().strftime("%d/%m/%Y")
     time = datetime.now().strftime("%H:%M:%S")
@@ -90,10 +82,18 @@ def get_time():
     return timestamp
 
 
+
+def signal_handler(signal, frame):
+    print('\n{}: Quitting client'.format(get_time()))
+    sys.exit(0)
+
+
+
+signal.signal(signal.SIGINT, signal_handler)
+
+
+
 if __name__ == '__main__':
     print("Client started!\n")
-    try:
-        while(True):
-            ui_loop()
-    except KeyboardInterrupt:
-        print("\nClient closing.")
+    while(True):
+        ui_loop()

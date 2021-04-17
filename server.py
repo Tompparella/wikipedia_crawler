@@ -7,6 +7,8 @@ import wikipedia
 import copy
 import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
+import signal
+import sys
 
 #server = SimpleXMLRPCServer(('127.0.0.1', 5000), logRequests=True, allow_none=True)
 port = 5000
@@ -40,6 +42,8 @@ def get_articles(article_list):
         print("{}: An error has occurred while searching wikipedia: {}".format(get_time(), e))
         return e
 
+
+
 def find_shortest_path(start,end):                                      # An RPC function that initializes the breadth-first-algorithm function.
     visited = []                    
     queue = []                 
@@ -50,6 +54,7 @@ def find_shortest_path(start,end):                                      # An RPC
     print("\n{} --- Commencing a search on articles '{}' and '{}'...\n".format(get_time(),start,end))
     path = get_path(queue,end,True,loop)
     return path
+
 
 
 def get_path(queue, end, threading, loop):                               # This my take on a threaded breadth-first-search algorithm. Due to wikipedias' connectedness, this is the best approach I could figure to querueing paths between articles.
@@ -108,6 +113,8 @@ def get_time():
     timestamp = "[{} - {}]".format(today, time)
     return timestamp
 
+
+
 def run_server(host=address, port=port):
     server_addr = (host, port)
     server = SimpleThreadedXMLRPCServer(server_addr)
@@ -119,9 +126,17 @@ def run_server(host=address, port=port):
     server.serve_forever()
 
 
+
+def signal_handler(signal, frame):
+    print('{}: Quitting server'.format(get_time()))
+    sys.exit(0)
+
+
+
+signal.signal(signal.SIGINT, signal_handler)
+
+
+
 if __name__ == '__main__':
-    try:
-        run_server()
-    except KeyboardInterrupt:
-        print('{}: Quitting server'.format(get_time()))
+    run_server()
 
