@@ -1,3 +1,8 @@
+#   Tommi Kunnari
+#   17.4.2021
+#   Wikipedia Crawler
+#   Made as a final project for a university course on Distributed Systems.
+
 from xmlrpc.client import ServerProxy
 from datetime import date, datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -6,7 +11,7 @@ import sys, signal
 
 proxy = ServerProxy('http://localhost:5000')
 
-def ui_loop():
+def ui_loop():                                                                                    # This is the main UI-loop that takes user input.
     print("This program finds the shortest paths between two wikipedia articles.\nCtrl+C to quit\n")
     search1 = input("Enter article 1: ")
     search2 = input("Enter article 2: ")
@@ -42,7 +47,7 @@ def ui_loop():
 
 
 
-def take_index(articles):
+def take_index(articles):                                                      # A helper-function to ease taking user's desired article.
     while True:
             try:
                 choice = int(input())
@@ -53,7 +58,8 @@ def take_index(articles):
 
 
 
-def find_shortest_path(a1,a2):
+def find_shortest_path(a1,a2):                                              # Requests the server to start handling the search and provides user with transparency.
+                                                                            # Also prints data referring to the seeked path.
     start = time.time()
     try:
         print("\nSearch in progres. This might take some time.\nPlease wait...\n")
@@ -69,13 +75,13 @@ def find_shortest_path(a1,a2):
 
 
 
-def get_articles(article_list):
+def get_articles(article_list):                                             # Sends the server a request to find the initial articles.
     articles = proxy.get_articles(article_list)
     return articles
 
 
     
-def get_time():
+def get_time():                                                             # A helper function to get current system time and format it.
     today = date.today().strftime("%d/%m/%Y")
     time = datetime.now().strftime("%H:%M:%S")
     timestamp = "{} - {}".format(today, time)
@@ -83,7 +89,7 @@ def get_time():
 
 
 
-def signal_handler(signal, frame):
+def signal_handler(signal, frame):                                          # Handles user interruptions.
     print('\n{}: Quitting client'.format(get_time()))
     sys.exit(0)
 
@@ -93,7 +99,7 @@ signal.signal(signal.SIGINT, signal_handler)
 
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':                                                  # Starts the UI-loop on startup.
     print("Client started!\n")
     while(True):
         ui_loop()

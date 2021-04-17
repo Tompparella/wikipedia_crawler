@@ -1,3 +1,8 @@
+#   Tommi Kunnari
+#   17.4.2021
+#   Wikipedia Crawler
+#   Made as a final project for a university course on Distributed Systems.
+
 from xmlrpc.server import SimpleXMLRPCServer
 from socketserver import ThreadingMixIn
 from datetime import date, datetime
@@ -30,7 +35,7 @@ class Loop:
 
 
 
-def get_articles(article_list):
+def get_articles(article_list):                                         # Finds the initial articles based on user input.
     print("{}: Searching wikipedia for '{}' and '{}'...".format(get_time(), article_list[0], article_list[1]))
     try:
         results = []
@@ -84,6 +89,7 @@ def get_path(queue, end, threading, loop):                               # This 
                     queue.append(a)
         except Exception as e:                                          # Exceptions only print an error, since wikipedia has a lot of dead links which throw errors. We can simply ignore these.
             print("{} --- Error: {}".format(get_time(), e))
+            #loop.visited.append(curr.title)
             pass
 
         if threading:                                           # Start threads if parent function.
@@ -104,10 +110,9 @@ def get_path(queue, end, threading, loop):                               # This 
             else:
                 return Exception
 
-            
-            
 
-def get_time():
+
+def get_time():                                                 # A helper function that gets current server time and foramts it.
     today = date.today().strftime("%d/%m/%Y")
     time = datetime.now().strftime("%H:%M:%S")
     timestamp = "[{} - {}]".format(today, time)
@@ -115,7 +120,7 @@ def get_time():
 
 
 
-def run_server(host=address, port=port):
+def run_server(host=address, port=port):                        # Starts the server and handles request concurrency.
     server_addr = (host, port)
     server = SimpleThreadedXMLRPCServer(server_addr)
 
@@ -127,7 +132,7 @@ def run_server(host=address, port=port):
 
 
 
-def signal_handler(signal, frame):
+def signal_handler(signal, frame):                              # Handles interruptions.
     print('{}: Quitting server'.format(get_time()))
     sys.exit(0)
 
@@ -137,6 +142,6 @@ signal.signal(signal.SIGINT, signal_handler)
 
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':                                      # Starts the server on startup.
     run_server()
 
